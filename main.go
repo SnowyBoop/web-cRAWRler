@@ -23,7 +23,7 @@ func errFunc() {
         panic("FUCK")
 }
 
-func runFunction(caller string) {
+func checkIP(caller string) {
         defer func() {
                 if r := recover(); r != nil {
                         fmt.Println("Recovered from function error:", r)
@@ -65,8 +65,8 @@ func main() {
                 }
         }()
 
-    runFunction("https://192.142.12.12")
-    runFunction("https://192.142.12.20")
+    checkIP("https://192.142.12.12")
+    checkIP("https://192.142.12.20")
 
     fmt.Println("all jobs done")
 
