@@ -19,32 +19,55 @@ func un(s string, startTime time.Time) {
     log.Println("  END:", s, "ElapsedTime in seconds:", endTime.Sub(startTime))
 }
 
-func main() {
-    resp, err := http.Get("https://nudle.ltd/contact")
+func errFunc() {
+        panic("FUCK")
+}
 
-    if err != nil {
-        log.Fatal(err)
-    }
+func runFunction(caller string) {
+        defer func() {
+                if r := recover(); r != nil {
+                        fmt.Println("Recovered from function error:", r)
+                }
+        }()
 
-    defer resp.Body.Close()
+        resp, err := http.Get(caller)
 
-    body, err := ioutil.ReadAll(resp.Body)
+        if err != nil {
+                fmt.Println("Error:", err)
+                defer func() {
+                        if r := recover(); r != nil {
+                                fmt.Println("Recovered from panic:", r)
+                        }
+                }()
+                panic(err)
+        }
 
-    if err != nil {
-        log.Fatal(err)
-    }
-        defer un(trace("nigg"))
-    stringBody := string(body)
+        defer resp.Body.Close()
+
+        body, err := ioutil.ReadAll(resp.Body)
+
+        stringBody := string(body)
 
         fmt.Println(stringBody)
 
-    if (strings.Contains(stringBody , "discord.gg/")) {
-        fmt.Println("contains html")
-        }
+        if (strings.Contains(stringBody , "test")) {}
 
 
-
-
+        errFunc()
 }
 
-const serverPort = 3333
+
+func main() {
+    fmt.Println("main exec")
+    defer func() {
+        if r := recover(); r != nil {
+                fmt.Println("Function error:", r)
+                }
+        }()
+
+    runFunction("https://192.142.12.12")
+    runFunction("https://192.142.12.20")
+
+    fmt.Println("all jobs done")
+
+}
