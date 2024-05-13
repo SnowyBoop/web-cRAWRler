@@ -43,6 +43,7 @@ func checkIP(caller string) {
         }()
 
         resp, err := http.Get(caller)
+
         if err != nil {
                 fmt.Println("Error:", err)
                 defer func() {
@@ -52,7 +53,7 @@ func checkIP(caller string) {
                                 if err != nil {
                                         log.Fatal(err)
                                 }
-                                if _, err := f.Write([]byte("something is unreachable\n")); err != nil {
+                                if _, err := f.Write([]byte(caller + " is unreachable\n")); err != nil {
                                         log.Fatal(err)
                                 }
                                 if err := f.Close(); err != nil {
@@ -66,6 +67,19 @@ func checkIP(caller string) {
         defer resp.Body.Close()
 
         body, err := ioutil.ReadAll(resp.Body)
+
+
+                f, err := os.OpenFile("scan.ip", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+                if err != nil {
+                        log.Fatal(err)
+                }
+                if _, err := f.Write([]byte(caller + " was callable\n")); err != nil {
+                        log.Fatal(err)
+                }
+                if err := f.Close(); err != nil {
+                         log.Fatal(err)
+                }
+
 
         stringBody := string(body)
 
@@ -84,6 +98,7 @@ func main() {
 
     checkIP("https://192.142.12.12")
     checkIP("https://192.142.12.20")
+    checkIP("https://1.1.1.1")
 
     fmt.Println("all jobs done")
 
