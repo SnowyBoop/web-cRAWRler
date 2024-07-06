@@ -8,6 +8,8 @@ import (
         "strings"
         "time"
         "os"
+                "math/rand"
+                "net"
 )
 
 func trace(s string) (string, time.Time) {
@@ -31,6 +33,24 @@ func generateFS() {
         log.Fatal(err)
     }
     defer f.Close()
+
+        f2, err := os.Create("minecraft.ip")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer f2.Close()
+
+        f3, err := os.Create("website.html")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer f3.Close()
+
+        f4, err := os.Create("discord.ip")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer f4.Close()
 
 
 }
@@ -81,25 +101,93 @@ func checkIP(caller string) {
                 }
 
 
+                f2, err := os.OpenFile("minecraft.ip", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+                if err != nil {
+                        log.Fatal(err)
+                }
+                if _, err := f2.Write([]byte(caller + " has port 25565 open\n")); err != nil {
+                        log.Fatal(err)
+                }
+                if err := f2.Close(); err != nil {
+                         log.Fatal(err)
+                }
+
+
         stringBody := string(body)
 
         fmt.Println(stringBody)
 
-        if (strings.Contains(stringBody , "test")) {}
+        if (strings.Contains(stringBody , "discord.gg")) {
+
+                            f, err := os.OpenFile("discord.ip", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+                if err != nil {
+                        log.Fatal(err)
+                }
+                if _, err := f.Write([]byte(caller + " contains a discord invite \n")); err != nil {
+                        log.Fatal(err)
+                        f.Close()
+                }
+                if err := f.Close(); err != nil {
+                         log.Fatal(err)
+                }
+
+                        fmt.Println("discord found on" + caller)
+
+        }
+
+
+
+        if (strings.Contains(stringBody , "html")) {
+
+                        if (!(strings.Contains(stringBody, "404") || strings.Contains(stringBody, "403") || strings.Contains(stringBody, "Forbidden"))) {
+
+                            f, err := os.OpenFile("website.html", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+                if err != nil {
+                        log.Fatal(err)
+                }
+                if _, err := f.Write([]byte("<a href='" + caller + "'>" + caller + " contains a valid website \n" + "</a></p> <br>")); err != nil {
+                        log.Fatal(err)
+                        f.Close()
+                }
+                if err := f.Close(); err != nil {
+                         log.Fatal(err)
+                }
+
+                        fmt.Println("website found on" + caller)
+                        }
+
+        }
 
 
         errFunc()
 }
+
 
 func main() {
     fmt.Println("start jobs")
 
     generateFS()
 
-    checkIP("https://192.142.12.12")
-    checkIP("https://192.142.12.20")
-    checkIP("https://1.1.1.1")
+for true {
+
+                time.Sleep(50 * time.Millisecond)
+
+                ip := make(net.IP, net.IPv4len)
+                for i := 0; i < net.IPv4len; i++ {
+                        ip[i] = byte(rand.Intn(256))
+                }
+
+                ips := ip.String()
+
+        fmt.Println("calling the ip" + ips)
+
+        go checkIP("http://" + ips)
+
+
+        }
 
     fmt.Println("all jobs done")
 
 }
+
+
